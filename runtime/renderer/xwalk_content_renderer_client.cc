@@ -11,6 +11,7 @@
 #include "third_party/WebKit/public/web/WebSecurityPolicy.h"
 #include "xwalk/application/common/constants.h"
 #include "xwalk/application/renderer/application_native_module.h"
+#include "xwalk/box2d/xwalk_box2d_module.h"
 #include "xwalk/extensions/renderer/xwalk_js_module.h"
 
 #if defined(OS_ANDROID)
@@ -93,6 +94,9 @@ void XWalkContentRendererClient::DidCreateModuleSystem(
   module_system->RegisterNativeModule("sysapps_promise",
       extensions::CreateJSModuleFromResource(
           IDR_XWALK_SYSAPPS_COMMON_PROMISE_API));
+  scoped_ptr<extensions::XWalkNativeModule> box2d_module(
+      new xwalk::extensions::XWalkBox2DModule());
+  module_system->RegisterNativeModule("box2d_module", box2d_module.Pass());
 }
 
 }  // namespace xwalk

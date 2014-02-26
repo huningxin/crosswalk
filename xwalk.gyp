@@ -57,6 +57,7 @@
         'xwalk_resources',
         'extensions/extensions.gyp:xwalk_extensions',
         'sysapps/sysapps.gyp:sysapps',
+        'box2d/box2d.gyp:xwalk_box2d',
       ],
       'include_dirs': [
         '..',

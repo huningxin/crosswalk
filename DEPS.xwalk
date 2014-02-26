@@ -15,6 +15,9 @@ deps_xwalk = {
 
   # Ozone-Wayland is required for Wayland support in Chromium.
   'src/ozone': 'https://github.com/01org/ozone-wayland.git@b2e17c52db443468a42a168dc91d873c7e707fca',
+
+  # Box2D is required for experimental Box2D XWalk extension.
+  'src/xwalk/box2d/third_party/box2d': 'https://github.com/huningxin/box2d.git@e10649a3006a488a5dffc331e68ccd540873cbb9',
 }
 vars_xwalk = {
 }

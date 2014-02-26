@@ -68,6 +68,16 @@ void CreateExtensionModules(XWalkExtensionClient* client,
     module_system->RegisterExtensionModule(module.Pass(),
                                            codepoint->entry_points);
   }
+
+  // TODO(nhu): to figure out the right way to register the box2d extension.
+  std::string name("xwalk.box2d");
+  std::string api("exports = requireNative('box2d_module');");
+  std::vector<std::string> entry_points;
+  scoped_ptr<XWalkExtensionModule> box2d_module(
+      new XWalkExtensionModule(client, module_system,
+                               name, api));
+  module_system->RegisterExtensionModule(box2d_module.Pass(),
+                                         entry_points);
 }
 
 }  // namespace
