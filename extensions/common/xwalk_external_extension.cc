@@ -125,6 +125,12 @@ void XWalkExternalExtension::SyncMessagingRegister(
   handle_sync_msg_callback_ = callback;
 }
 
+void XWalkExternalExtension::BinaryMessagingRegister(
+    XW_HandleBinaryMessageCallback callback) {
+  RETURN_IF_INITIALIZED("Register from BinaryMessagingInterface");
+  handle_binary_msg_callback_ = callback;
+}
+
 void XWalkExternalExtension::EntryPointsSetExtraJSEntryPoints(
     const char** entry_points) {
   RETURN_IF_INITIALIZED("SetExtraJSEntryPoints from EntryPoints");

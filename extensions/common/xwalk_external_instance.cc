@@ -81,5 +81,11 @@ void XWalkExternalInstance::SyncMessagingSetSyncReply(const char* reply) {
   SendSyncReplyToJS(scoped_ptr<base::Value>(new base::StringValue(reply)));
 }
 
+void XWalkExternalInstance::BinaryMessagingPostMessage(const char* msg,
+                                                       const size_t size) {
+  PostMessageToJS(scoped_ptr<base::Value>(
+      base::BinaryValue::CreateWithCopiedBuffer(msg, size)));
+}
+
 }  // namespace extensions
 }  // namespace xwalk

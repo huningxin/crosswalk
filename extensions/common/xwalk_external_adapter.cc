@@ -88,6 +88,15 @@ const void* XWalkExternalAdapter::GetInterface(const char* name) {
     return &syncMessagingInterface1;
   }
 
+  if (!strcmp(name, XW_BINARY_MESSAGING_INTERFACE_1)) {
+    static const XW_BinaryMessagingInterface_1
+        binaryMessagingInterface1 = {
+      BinaryMessagingRegister,
+      BinaryMessagingPostMessage
+    };
+    return &binaryMessagingInterface1;
+  }
+
   if (!strcmp(name, XW_INTERNAL_ENTRY_POINTS_INTERFACE_1)) {
     static const XW_Internal_EntryPointsInterface_1 entryPointsInterface1 = {
       EntryPointsSetExtraJSEntryPoints

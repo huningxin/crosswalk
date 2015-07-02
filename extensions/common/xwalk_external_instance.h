@@ -47,6 +47,10 @@ class XWalkExternalInstance : public XWalkExtensionInstance {
   // implementation.
   void SyncMessagingSetSyncReply(const char* reply);
 
+  // XW_BinaryMessagingInterface_1 (from XW_Extension_BinaryMessage.h)
+  // implementation.
+  void BinaryMessagingPostMessage(const char* msg, const size_t size);
+
   XW_Instance xw_instance_;
   std::string sync_reply_;
   XWalkExternalExtension* extension_;
