@@ -34,6 +34,8 @@ public interface XWalkExtensionContextClient {
      */
     public void postMessage(XWalkExtensionClient extension, int instanceId, String message);
 
+    public void postBinaryMessage(XWalkExtensionClient extension, int instanceId, byte[] message);
+
     /**
      * Broadcast a message to all extension instances.
      *

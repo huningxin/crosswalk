@@ -338,6 +338,10 @@ public class XWalkExtensionClient {
         mExtensionContext.postMessage(this, instanceID, message);
     }
 
+    public final void postBinaryMessage(int instanceID, byte[] message) {
+        mExtensionContext.postBinaryMessage(this, instanceID, message);
+    }    
+
     /**
      * Broadcast messages to JavaScript via extension's context.
      * It's used by child classes to broadcast message from Java side

@@ -54,6 +54,11 @@ public abstract class XWalkExtensionInternal extends XWalkExtensionAndroid {
         super.postMessage(instanceID, message);
     }
 
+    @XWalkAPI
+    public void postBinaryMessage(int instanceID, byte[] message) {
+        super.postBinaryMessage(instanceID, message);
+    }
+
     /**
      * Broadcast message to all extension instances.
      * @param message the message.

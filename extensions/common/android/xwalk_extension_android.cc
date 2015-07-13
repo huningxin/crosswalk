@@ -72,6 +72,22 @@ void XWalkExtensionAndroid::PostMessage(JNIEnv* env, jobject obj,
   env->ReleaseStringUTFChars(msg, str);
 }
 
+void XWalkExtensionAndroid::PostBinaryMessage(JNIEnv* env, jobject obj,
+                                              jint instance, jbyteArray msg) {
+  if (!is_valid()) return;
+
+  InstanceMap::iterator it = instances_.find(instance);
+  if (it == instances_.end()) {
+    LOG(WARNING) << "Instance(" << instance << ") not found ";
+    return;
+  }
+
+  jbyte* msg_ptr = env->GetByteArrayElements(msg, NULL);
+  jsize msg_size = env->GetArrayLength(msg);
+  it->second->PostBinaryMessageWrapper((const char*)msg_ptr, msg_size);
+  env->ReleaseByteArrayElements(msg, msg_ptr, JNI_ABORT);
+}
+
 void XWalkExtensionAndroid::BroadcastMessage(JNIEnv* env, jobject obj,
                                              jstring msg) {
   if (!is_valid()) return;

@@ -25,6 +25,8 @@ interface XWalkRuntimeExtensionBridge {
      */
     public void postMessage(int instanceId, String message);
 
+    public void postBinaryMessage(int instanceId, byte[] message);
+
     /**
      * Broadcast a message frome native side to all receivers on JavaScript side.
      *

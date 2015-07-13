@@ -47,6 +47,15 @@ public abstract class XWalkExtensionAndroid {
         nativePostMessage(mXWalkExtension, instanceID, message);
     }
 
+    public void postBinaryMessage(int instanceID, byte[] message) {
+        if (mXWalkExtension == 0) {
+            Log.e(TAG, "Can not post a message to an invalid extension!");
+            return;
+        }
+
+        nativePostBinaryMessage(mXWalkExtension, instanceID, message);
+    }
+
     public void broadcastMessage(String message) {
         if (mXWalkExtension == 0) {
             Log.e(TAG, "Can not broadcast message to an invalid extension!");
@@ -64,6 +73,7 @@ public abstract class XWalkExtensionAndroid {
 
     private native long nativeGetOrCreateExtension(String name, String jsApi, String[] entryPoints);
     private native void nativePostMessage(long nativeXWalkExtensionAndroid, int instanceID, String message);
+    private native void nativePostBinaryMessage(long nativeXWalkExtensionAndroid, int instanceID, byte[] message);
     private native void nativeBroadcastMessage(long nativeXWalkExtensionAndroid, String message);
     private native void nativeDestroyExtension(long nativeXWalkExtensionAndroid);
 }
