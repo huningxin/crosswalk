@@ -65,8 +65,10 @@
         'xwalk_pak',
         'xwalk_resources',
         'extensions/extensions.gyp:xwalk_extensions',
+        'nodejs/xwalk_nodejs.gyp:xwalk_nodejs',
         'sysapps/sysapps.gyp:sysapps',
         '../third_party/boringssl/boringssl.gyp:boringssl',
+        '../third_party/node/node.gyp:node',
       ],
       'include_dirs': [
         '..',

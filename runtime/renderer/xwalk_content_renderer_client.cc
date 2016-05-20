@@ -31,6 +31,7 @@
 #include "xwalk/runtime/common/xwalk_localized_error.h"
 #include "xwalk/runtime/renderer/isolated_file_system.h"
 #include "xwalk/runtime/renderer/pepper/pepper_helper.h"
+#include "xwalk/nodejs/nodejs_content.h"
 
 #if defined(OS_ANDROID)
 #include "components/cdm/renderer/android_key_systems.h"
@@ -73,12 +74,16 @@ class XWalkFrameHelper
     if (extension_controller_)
       extension_controller_->DidCreateScriptContext(
           render_frame()->GetWebFrame(), context);
+
+    nodejs::DidCreateScriptContext(render_frame()->GetWebFrame(), context);
   }
   void WillReleaseScriptContext(v8::Handle<v8::Context> context,
                                 int world_id) override {
     if (extension_controller_)
       extension_controller_->WillReleaseScriptContext(
           render_frame()->GetWebFrame(), context);
+
+    nodejs::WillReleaseScriptContext(render_frame()->GetWebFrame(), context);
   }
 
  private:
