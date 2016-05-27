@@ -369,6 +369,13 @@
         },
       },
       'conditions': [
+        ['enable_node==1', {
+          'defines': ['ENABLE_NODE'],
+          'dependencies': [
+            '../third_party/node/node.gyp:node',
+            'node/xwalk_node.gyp:xwalk_node',
+          ],
+        }],
         ['OS=="android"',{
           'dependencies':[
             '../components/components.gyp:cdm_browser',

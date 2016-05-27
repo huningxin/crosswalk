@@ -17,6 +17,9 @@
 #include "media/base/key_system_info.h"
 #include "ui/base/page_transition_types.h"
 #include "xwalk/extensions/renderer/xwalk_extension_renderer_controller.h"
+#if defined(ENABLE_NODE)
+#include "xwalk/node/xwalk_node_renderer_controller.h"
+#endif
 #if defined(OS_ANDROID)
 #include "xwalk/runtime/renderer/android/xwalk_render_process_observer.h"
 #else
@@ -81,6 +84,10 @@ class XWalkContentRendererClient
       extension_controller_;
 
   scoped_ptr<visitedlink::VisitedLinkSlave> visited_link_slave_;
+
+#if defined(ENABLE_NODE)
+  scoped_ptr<node::XWalkNodeRendererController> node_controller_;
+#endif
 
   void GetNavigationErrorStrings(
       content::RenderFrame* render_frame,

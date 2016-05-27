@@ -152,7 +152,29 @@
     # respective POM files.
     'xwalk_core_library_artifact_id%': 'xwalk_core_library_canary',
     'xwalk_shared_library_artifact_id%': 'xwalk_shared_library_canary',
+
+    'enable_node%': 0,
   },
+  'conditions': [
+    ['enable_node==1', {
+      'target_defaults': {
+        'target_conditions': [
+          ['_target_name in ["v8", "v8_snapshot", "v8_nosnapshot", "v8_external_snapshot", "v8_base", "v8_libbase", "v8_libplatform", "mksnapshot"]', {
+            'cflags!': [
+              '-fvisibility=hidden',
+              '-fdata-sections',
+              '-ffunction-sections',
+            ],
+            'cflags_cc!': ['-fvisibility-inlines-hidden'],
+            'defines': [
+              'V8_SHARED',
+              'BUILDING_V8_SHARED',
+            ],
+          }],
+        ],
+      },
+    }]
+  ],
   'target_defaults': {
     'conditions': [
       # TODO(rakuco): Remove this once we stop supporting Ubuntu Precise or

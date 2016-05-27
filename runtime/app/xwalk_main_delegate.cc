@@ -14,10 +14,12 @@
 #include "ui/base/ui_base_paths.h"
 #include "xwalk/extensions/common/xwalk_extension_switches.h"
 #include "xwalk/extensions/extension_process/xwalk_extension_process_main.h"
+#include "xwalk/node/xwalk_node_renderer_controller.h"
 #include "xwalk/runtime/browser/xwalk_runner.h"
 #include "xwalk/runtime/common/logging_xwalk.h"
 #include "xwalk/runtime/common/paths_mac.h"
 #include "xwalk/runtime/common/xwalk_paths.h"
+#include "xwalk/runtime/common/xwalk_switches.h"
 #include "xwalk/runtime/renderer/xwalk_content_renderer_client.h"
 
 #if !defined(DISABLE_NACL) && defined(OS_LINUX)
@@ -88,6 +90,12 @@ int XWalkMainDelegate::RunProcess(const std::string& process_type,
     const content::MainFunctionParams& main_function_params) {
   if (process_type == switches::kXWalkExtensionProcess)
     return XWalkExtensionProcessMain(main_function_params);
+#if defined(ENABLE_NODE)
+  if (process_type == switches::kXWalkNodeProcess) {
+    node::XWalkNodeRendererController::StartNodeProcess();
+    return 0;
+  }
+#endif
   // Tell content to use default process main entries by returning -1.
   return -1;
 }

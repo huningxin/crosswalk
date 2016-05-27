@@ -18,17 +18,20 @@
 #include "grit/xwalk_application_resources.h"
 #include "grit/xwalk_sysapps_resources.h"
 #include "net/base/net_errors.h"
+#include "net/base/filename_util.h"
 #include "third_party/WebKit/public/platform/WebString.h"
 #include "third_party/WebKit/public/platform/WebURLError.h"
 #include "third_party/WebKit/public/platform/WebURLRequest.h"
 #include "third_party/WebKit/public/web/WebDocument.h"
 #include "third_party/WebKit/public/web/WebSecurityPolicy.h"
+#include "url/gurl.h"
 #include "xwalk/application/common/constants.h"
 #include "xwalk/application/renderer/application_native_module.h"
 #include "xwalk/extensions/common/xwalk_extension_switches.h"
 #include "xwalk/extensions/renderer/xwalk_js_module.h"
 #include "xwalk/runtime/common/xwalk_common_messages.h"
 #include "xwalk/runtime/common/xwalk_localized_error.h"
+#include "xwalk/runtime/common/xwalk_switches.h"
 #include "xwalk/runtime/renderer/isolated_file_system.h"
 #include "xwalk/runtime/renderer/pepper/pepper_helper.h"
 
@@ -65,6 +68,16 @@ class XWalkFrameHelper
       : content::RenderFrameObserver(render_frame),
         content::RenderFrameObserverTracker<XWalkFrameHelper>(render_frame),
         extension_controller_(extension_controller) {}
+#if defined(ENABLE_NODE)
+  XWalkFrameHelper(
+      content::RenderFrame* render_frame,
+      extensions::XWalkExtensionRendererController* extension_controller,
+      node::XWalkNodeRendererController* node_controller)
+      : content::RenderFrameObserver(render_frame),
+        content::RenderFrameObserverTracker<XWalkFrameHelper>(render_frame),
+        extension_controller_(extension_controller),
+        node_controller_(node_controller) {}
+#endif
   ~XWalkFrameHelper() override {}
 
   // RenderFrameObserver implementation.
@@ -73,16 +86,30 @@ class XWalkFrameHelper
     if (extension_controller_)
       extension_controller_->DidCreateScriptContext(
           render_frame()->GetWebFrame(), context);
+
+#if defined(ENABLE_NODE)
+    if (node_controller_)
+      node_controller_->DidCreateScriptContext(
+          render_frame()->GetWebFrame(), context);
+#endif
   }
   void WillReleaseScriptContext(v8::Handle<v8::Context> context,
                                 int world_id) override {
     if (extension_controller_)
       extension_controller_->WillReleaseScriptContext(
           render_frame()->GetWebFrame(), context);
+#if defined(ENABLE_NODE)
+    if (node_controller_)
+      node_controller_->WillReleaseScriptContext(
+          render_frame()->GetWebFrame(), context);
+#endif
   }
 
  private:
   extensions::XWalkExtensionRendererController* extension_controller_;
+#if defined(ENABLE_NODE)
+  node::XWalkNodeRendererController* node_controller_;
+#endif
 
   DISALLOW_COPY_AND_ASSIGN(XWalkFrameHelper);
 };
@@ -116,6 +143,18 @@ void XWalkContentRendererClient::RenderThreadStarted() {
   if (!cmd_line->HasSwitch(switches::kXWalkDisableExtensions))
     extension_controller_.reset(
         new extensions::XWalkExtensionRendererController(this));
+
+#if defined(ENABLE_NODE)
+  if (cmd_line->HasSwitch(switches::kXWalkEnableNode)) {
+    base::FilePath path;
+    GURL::GURL url(base::CommandLine::ForCurrentProcess()->GetSwitchValueNative(
+        switches::kStartupUrl));
+    bool is_local = url.SchemeIsFile() && net::FileURLToFilePath(url, &path);
+    if (is_local) {
+      node_controller_.reset(new node::XWalkNodeRendererController(path));
+    }
+  }
+#endif
 
   blink::WebString application_scheme(
       base::ASCIIToUTF16(application::kApplicationScheme));
@@ -186,7 +225,11 @@ bool XWalkContentRendererClient::HandleNavigation(
 
 void XWalkContentRendererClient::RenderFrameCreated(
     content::RenderFrame* render_frame) {
+#if !defined(ENABLE_NODE)
   new XWalkFrameHelper(render_frame, extension_controller_.get());
+#else
+  new XWalkFrameHelper(render_frame, extension_controller_.get(), node_controller_.get());
+#endif
 #if defined(OS_ANDROID)
   new XWalkPermissionClient(render_frame);
 #endif

@@ -161,6 +161,10 @@ void XWalkContentBrowserClient::AppendExtraCommandLineSwitches(
       *base::CommandLine::ForCurrentProcess();
   const char* extra_switches[] = {
     switches::kXWalkDisableExtensionProcess,
+#if defined(ENABLE_NODE)
+    switches::kXWalkEnableNode,
+    switches::kStartupUrl,
+#endif
 #if defined(ENABLE_PLUGINS)
     switches::kPpapiFlashPath,
     switches::kPpapiFlashVersion

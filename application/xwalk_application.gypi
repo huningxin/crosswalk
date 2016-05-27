@@ -42,6 +42,11 @@
         '..',
         '../..',
       ],
+      'conditions': [
+        ['enable_node==1', {
+            'defines': ['ENABLE_NODE'],
+        }],
+      ],
     },
 
     {

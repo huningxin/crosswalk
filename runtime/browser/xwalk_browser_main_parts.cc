@@ -135,6 +135,12 @@ void XWalkBrowserMainParts::PreMainMessageLoopStart() {
   }
   command_line->AppendSwitchASCII(switches::kJavaScriptFlags, js_flags);
   startup_url_ = GetURLFromCommandLine(*command_line);
+
+#if defined(ENABLE_NODE)
+  if (command_line->HasSwitch(switches::kXWalkEnableNode))
+    command_line->AppendSwitchASCII(switches::kStartupUrl,
+                                    startup_url_.spec().c_str());
+#endif
 }
 
 void XWalkBrowserMainParts::PostMainMessageLoopStart() {

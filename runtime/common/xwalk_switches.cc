@@ -61,6 +61,17 @@ const char kPpapiFlashPath[] = "ppapi-flash-path";
 const char kPpapiFlashVersion[] = "ppapi-flash-version";
 #endif
 
+#if defined(ENABLE_NODE)
+// Enable the node for renderer. Need the "--no-sandbox" swtich.
+const char kXWalkEnableNode[] = "enable-node";
+
+// Used internally to launch a node process.
+const char kXWalkNodeProcess[] = "node-process";
+
+// Use this path to set the nodejs module search path.
+const char kStartupUrl[] = "startup-url";
+#endif
+
 // Specifies the user data directory, which is where the browser will look for
 // all of its state.
 const char kUserDataDir[] = "user-data-dir";
