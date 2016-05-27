@@ -17,6 +17,7 @@
 #include "media/base/key_system_info.h"
 #include "ui/base/page_transition_types.h"
 #include "xwalk/extensions/renderer/xwalk_extension_renderer_controller.h"
+#include "xwalk/nodejs/node_bindings.h"
 #if defined(OS_ANDROID)
 #include "xwalk/runtime/renderer/android/xwalk_render_process_observer.h"
 #else
@@ -81,6 +82,8 @@ class XWalkContentRendererClient
 
   scoped_ptr<extensions::XWalkExtensionRendererController>
       extension_controller_;
+
+  scoped_ptr<nodejs::NodeBindings> node_bindings_;
 
 #if defined(OS_ANDROID)
   scoped_ptr<visitedlink::VisitedLinkSlave> visited_link_slave_;
