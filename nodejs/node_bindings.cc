@@ -21,7 +21,10 @@
 #include "content/public/browser/browser_thread.h"
 #include "content/public/common/content_paths.h"
 #include "third_party/WebKit/public/web/WebScopedMicrotaskSuppression.h"
+#include "xwalk/runtime/common/xwalk_switches.h"
 #include "xwalk/nodejs/node_includes.h"
+
+#include "xwalk_node_natives.h"  // NOLINT
 
 using content::BrowserThread;
 
@@ -55,29 +58,14 @@ std::unique_ptr<const char*[]> StringVectorToArgArray(
   return array;
 }
 
-base::FilePath GetResourcesPath(bool is_browser) {
-  auto command_line = base::CommandLine::ForCurrentProcess();
-  base::FilePath exec_path(command_line->GetProgram());
-  PathService::Get(base::FILE_EXE, &exec_path);
-
-  base::FilePath resources_path =
-#if defined(OS_MACOSX)
-      is_browser ? exec_path.DirName().DirName().Append("Resources") :
-                   exec_path.DirName().DirName().DirName().DirName().DirName()
-                            .Append("Resources");
-#else
-      exec_path.DirName().Append(FILE_PATH_LITERAL("resources"));
-#endif
-  return resources_path;
-}
-
 }  // namespace
 
-NodeBindings::NodeBindings()
+NodeBindings::NodeBindings(base::FilePath& manifest_path)
     : message_loop_(nullptr),
       uv_loop_(uv_default_loop()),
       embed_closed_(false),
       uv_env_(nullptr),
+      manifest_path_(manifest_path),
       weak_factory_(this) {
 }
 
@@ -140,20 +128,28 @@ void NodeBindings::Initialize() {
 node::Environment* NodeBindings::CreateEnvironment(
     v8::Handle<v8::Context> context) {
   std::vector<std::string> args = base::CommandLine::ForCurrentProcess()->argv();
-
-  // Feed node the path to initialization script.
-  base::FilePath::StringType process_type = FILE_PATH_LITERAL("renderer");
-  base::FilePath resources_path = GetResourcesPath(false);
-  base::FilePath script_path =
-      resources_path.Append(process_type)
-                    .Append(FILE_PATH_LITERAL("init.js"));
-  std::string script_path_str = script_path.AsUTF8Unsafe();
-  args.insert(args.begin() + 1, script_path_str.c_str());
-
   std::unique_ptr<const char*[]> c_argv = StringVectorToArgArray(args);
+
   node::Environment* env = node::CreateEnvironment(
       context->GetIsolate(), uv_default_loop(), context,
       args.size(), c_argv.get(), 0, nullptr);
+
+  env->process_object()->DefineOwnProperty(
+      env->context(),
+      v8::String::NewFromUtf8(env->isolate(), "_init_native"),
+      v8::String::NewFromUtf8(
+          env->isolate(),
+          reinterpret_cast<const char*>(node::init_native),
+          v8::NewStringType::kNormal,
+          sizeof(node::init_native)).ToLocalChecked()).FromJust();
+
+  
+  env->process_object()->DefineOwnProperty(
+      env->context(),
+      v8::String::NewFromUtf8(env->isolate(), "_app_manifest_path"),
+      v8::String::NewFromUtf8(
+          env->isolate(),
+          manifest_path_.DirName().MaybeAsASCII().c_str())).FromJust();
 
   return env;
 }

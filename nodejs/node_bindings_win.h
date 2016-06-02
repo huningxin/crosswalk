@@ -19,7 +19,7 @@ namespace nodejs {
 
 class NodeBindingsWin : public NodeBindings {
  public:
-  explicit NodeBindingsWin();
+  explicit NodeBindingsWin(base::FilePath& manifest_path);
   virtual ~NodeBindingsWin();
 
  private:

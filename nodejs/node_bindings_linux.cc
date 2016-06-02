@@ -15,8 +15,8 @@ namespace xwalk {
 
 namespace nodejs {
 
-NodeBindingsLinux::NodeBindingsLinux()
-    : NodeBindings(),
+NodeBindingsLinux::NodeBindingsLinux(base::FilePath& manifest_path)
+    : NodeBindings(manifest_path),
       epoll_(epoll_create(1)) {
   int backend_fd = uv_backend_fd(uv_loop_);
   struct epoll_event ev = { 0 };
@@ -57,8 +57,8 @@ void NodeBindingsLinux::PollEvents() {
 }
 
 // static
-NodeBindings* NodeBindings::Create() {
-  return new NodeBindingsLinux();
+NodeBindings* NodeBindings::Create(base::FilePath& manifest_path) {
+  return new NodeBindingsLinux(manifest_path);
 }
 
 }  // namespace nodejs

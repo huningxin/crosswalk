@@ -21,8 +21,8 @@ namespace xwalk {
 
 namespace nodejs {
 
-NodeBindingsWin::NodeBindingsWin()
-    : NodeBindings() {
+NodeBindingsWin::NodeBindingsWin(base::FilePath& manifest_path)
+    : NodeBindings(manifest_path) {
 }
 
 NodeBindingsWin::~NodeBindingsWin() {
@@ -52,8 +52,8 @@ void NodeBindingsWin::PollEvents() {
 }
 
 // static
-NodeBindings* NodeBindings::Create() {
-  return new NodeBindingsWin();
+NodeBindings* NodeBindings::Create(base::FilePath& manifest_path) {
+  return new NodeBindingsWin(manifest_path);
 }
 
 }  // namespace nodejs

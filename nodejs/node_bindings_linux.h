@@ -19,7 +19,7 @@ namespace nodejs {
 
 class NodeBindingsLinux : public NodeBindings {
  public:
-  explicit NodeBindingsLinux();
+  explicit NodeBindingsLinux(base::FilePath& manifest_path);
   ~NodeBindingsLinux() override;
 
   void RunMessageLoop() override;

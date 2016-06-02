@@ -10,6 +10,7 @@
 #ifndef XWALK_NODEJS_NODE_BINDINGS_H_
 #define XWALK_NODEJS_NODE_BINDINGS_H_
 
+#include "base/files/file_path.h"
 #include "base/macros.h"
 #include "base/memory/weak_ptr.h"
 #include "v8/include/v8.h"
@@ -30,7 +31,7 @@ namespace nodejs {
 
 class NodeBindings {
  public:
-  static NodeBindings* Create();
+  static NodeBindings* Create(base::FilePath& manifest_path);
 
   virtual ~NodeBindings();
 
@@ -61,7 +62,7 @@ class NodeBindings {
   void set_uv_env(node::Environment* env) { uv_env_ = env; }
   node::Environment* uv_env() const { return uv_env_; }
 
-  explicit NodeBindings();
+  explicit NodeBindings(base::FilePath& manifest_path);
 
   // Called to poll events in new thread.
   virtual void PollEvents() = 0;
@@ -99,6 +100,8 @@ class NodeBindings {
 
   // Environment that to wrap the uv loop.
   node::Environment* uv_env_;
+
+  base::FilePath manifest_path_;
 
   base::WeakPtrFactory<NodeBindings> weak_factory_;
 

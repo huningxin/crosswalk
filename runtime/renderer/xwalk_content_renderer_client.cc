@@ -18,17 +18,20 @@
 #include "grit/xwalk_application_resources.h"
 #include "grit/xwalk_sysapps_resources.h"
 #include "net/base/net_errors.h"
+#include "net/base/filename_util.h"
 #include "third_party/WebKit/public/platform/WebString.h"
 #include "third_party/WebKit/public/platform/WebURLError.h"
 #include "third_party/WebKit/public/platform/WebURLRequest.h"
 #include "third_party/WebKit/public/web/WebDocument.h"
 #include "third_party/WebKit/public/web/WebSecurityPolicy.h"
+#include "url/gurl.h"
 #include "xwalk/application/common/constants.h"
 #include "xwalk/application/renderer/application_native_module.h"
 #include "xwalk/extensions/common/xwalk_extension_switches.h"
 #include "xwalk/extensions/renderer/xwalk_js_module.h"
 #include "xwalk/runtime/common/xwalk_common_messages.h"
 #include "xwalk/runtime/common/xwalk_localized_error.h"
+#include "xwalk/runtime/common/xwalk_switches.h"
 #include "xwalk/runtime/renderer/isolated_file_system.h"
 #include "xwalk/runtime/renderer/pepper/pepper_helper.h"
 
@@ -144,8 +147,14 @@ void XWalkContentRendererClient::RenderThreadStarted() {
         new extensions::XWalkExtensionRendererController(this));
 
 #if defined(ENABLE_NODEJS)
-  // TODO: add "--nodejs"
-  node_bindings_.reset(nodejs::NodeBindings::Create());
+  if (cmd_line->HasSwitch(switches::kXWalkEnableNodeJs)) {
+    base::FilePath path;
+    GURL::GURL url(base::CommandLine::ForCurrentProcess()->GetSwitchValueNative(
+        switches::kStartupUrl));
+    bool is_local = url.SchemeIsFile() && net::FileURLToFilePath(url, &path);
+    if (is_local)
+      node_bindings_.reset(nodejs::NodeBindings::Create(path));
+  }
 #endif
 
   blink::WebString application_scheme(

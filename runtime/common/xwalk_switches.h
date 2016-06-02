@@ -33,6 +33,11 @@ extern const char kPpapiFlashPath[];
 extern const char kPpapiFlashVersion[];
 #endif
 
+#if defined(ENABLE_NODEJS)
+extern const char kXWalkEnableNodeJs[];
+extern const char kStartupUrl[];
+#endif
+
 extern const char kUserDataDir[];
 
 }  // namespace switches

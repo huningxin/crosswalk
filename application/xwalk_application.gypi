@@ -42,6 +42,11 @@
         '..',
         '../..',
       ],
+      'conditions': [
+        ['enable_nodejs==1', {
+            'defines': ['ENABLE_NODEJS'],
+        }],
+      ],
     },
 
     {

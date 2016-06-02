@@ -6,6 +6,10 @@
       },
       'target_name': 'xwalk_nodejs',
       'type': 'static_library',
+      'dependencies': [
+        'xwalk_node_js2c',
+      ],
+      'defines': ['ENABLE_NODEJS'],
       'include_dirs': [
         '..',
         '../..',
@@ -16,6 +20,7 @@
         '<(DEPTH)/v8/include',
         '<(DEPTH)/third_party/WebKit/',
         '<(DEPTH)/third_party/WebKit/Source',
+        '<(SHARED_INTERMEDIATE_DIR)',
       ],
       'sources': [
         'node_bindings.cc',
@@ -27,5 +32,26 @@
         'node_includes.h',
       ],
     },
+    {
+      'target_name': 'xwalk_node_js2c',
+      'type': 'none',
+      'actions': [
+        {
+          'action_name': 'xwalk_node_js2c',
+          'inputs': [
+            'init.js',
+          ],
+          'outputs': [
+            '<(SHARED_INTERMEDIATE_DIR)/xwalk_node_natives.h',
+          ],
+          'action': [
+            'python',
+            '<(DEPTH)/third_party/node/tools/js2c.py',
+            '<@(_outputs)',
+            '<@(_inputs)',
+          ],
+        },
+      ],
+    }, # end node_js2c
   ],
 }
