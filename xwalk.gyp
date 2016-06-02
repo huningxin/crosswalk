@@ -67,8 +67,6 @@
         'extensions/extensions.gyp:xwalk_extensions',
         'sysapps/sysapps.gyp:sysapps',
         '../third_party/boringssl/boringssl.gyp:boringssl',
-        '../third_party/node/node.gyp:node',
-        'nodejs/xwalk_nodejs.gyp:xwalk_nodejs',
       ],
       'include_dirs': [
         '..',
@@ -369,6 +367,13 @@
         },
       },
       'conditions': [
+        ['enable_nodejs==1', {
+          'defines': ['ENABLE_NODEJS'],
+          'dependencies': [
+            '../third_party/node/node.gyp:node',
+            'nodejs/xwalk_nodejs.gyp:xwalk_nodejs',
+          ],
+        }],
         ['OS=="android"',{
           'dependencies':[
             '../components/components.gyp:cdm_browser',

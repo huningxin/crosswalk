@@ -2,6 +2,11 @@
 // Use of this source code is governed by the MIT license that can be
 // found in the LICENSE file.
 
+// The Crosswalk adaption code is under:
+// Copyright (c) 2016 Intel Corporation. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 #ifndef XWALK_NODEJS_NODE_BINDINGS_H_
 #define XWALK_NODEJS_NODE_BINDINGS_H_
 
@@ -25,7 +30,7 @@ namespace nodejs {
 
 class NodeBindings {
  public:
-  static NodeBindings* Create(bool is_browser);
+  static NodeBindings* Create();
 
   virtual ~NodeBindings();
 
@@ -56,7 +61,7 @@ class NodeBindings {
   void set_uv_env(node::Environment* env) { uv_env_ = env; }
   node::Environment* uv_env() const { return uv_env_; }
 
-  explicit NodeBindings(bool is_browser);
+  explicit NodeBindings();
 
   // Called to poll events in new thread.
   virtual void PollEvents() = 0;
@@ -69,9 +74,6 @@ class NodeBindings {
 
   // Interrupt the PollEvents.
   void WakeupEmbedThread();
-
-  // Are we running in browser.
-  bool is_browser_;
 
   // Main thread's MessageLoop.
   base::MessageLoop* message_loop_;

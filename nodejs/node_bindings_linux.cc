@@ -2,6 +2,11 @@
 // Use of this source code is governed by the MIT license that can be
 // found in the LICENSE file.
 
+// The Crosswalk adaption code is under:
+// Copyright (c) 2016 Intel Corporation. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 #include "xwalk/nodejs/node_bindings_linux.h"
 
 #include <sys/epoll.h>
@@ -10,8 +15,8 @@ namespace xwalk {
 
 namespace nodejs {
 
-NodeBindingsLinux::NodeBindingsLinux(bool is_browser)
-    : NodeBindings(is_browser),
+NodeBindingsLinux::NodeBindingsLinux()
+    : NodeBindings(),
       epoll_(epoll_create(1)) {
   int backend_fd = uv_backend_fd(uv_loop_);
   struct epoll_event ev = { 0 };
@@ -52,8 +57,8 @@ void NodeBindingsLinux::PollEvents() {
 }
 
 // static
-NodeBindings* NodeBindings::Create(bool is_browser) {
-  return new NodeBindingsLinux(is_browser);
+NodeBindings* NodeBindings::Create() {
+  return new NodeBindingsLinux();
 }
 
 }  // namespace nodejs

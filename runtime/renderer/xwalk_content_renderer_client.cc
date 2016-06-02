@@ -61,12 +61,20 @@ class XWalkFrameHelper
  public:
   XWalkFrameHelper(
       content::RenderFrame* render_frame,
+      extensions::XWalkExtensionRendererController* extension_controller)
+      : content::RenderFrameObserver(render_frame),
+        content::RenderFrameObserverTracker<XWalkFrameHelper>(render_frame),
+        extension_controller_(extension_controller) {}
+#if defined(ENABLE_NODEJS)
+  XWalkFrameHelper(
+      content::RenderFrame* render_frame,
       extensions::XWalkExtensionRendererController* extension_controller,
       nodejs::NodeBindings* node_bindings)
       : content::RenderFrameObserver(render_frame),
         content::RenderFrameObserverTracker<XWalkFrameHelper>(render_frame),
         extension_controller_(extension_controller),
         node_bindings_(node_bindings) {}
+#endif
   ~XWalkFrameHelper() override {}
 
   // RenderFrameObserver implementation.
@@ -76,24 +84,29 @@ class XWalkFrameHelper
       extension_controller_->DidCreateScriptContext(
           render_frame()->GetWebFrame(), context);
 
+#if defined(ENABLE_NODEJS)
     if (node_bindings_)
       node_bindings_->DidCreateScriptContext(
           render_frame()->GetWebFrame(), context);
+#endif
   }
   void WillReleaseScriptContext(v8::Handle<v8::Context> context,
                                 int world_id) override {
     if (extension_controller_)
       extension_controller_->WillReleaseScriptContext(
           render_frame()->GetWebFrame(), context);
-
+#if defined(ENABLE_NODEJS)
     if (node_bindings_)
       node_bindings_->WillReleaseScriptContext(
           render_frame()->GetWebFrame(), context);
+#endif
   }
 
  private:
   extensions::XWalkExtensionRendererController* extension_controller_;
+#if defined(ENABLE_NODEJS)
   nodejs::NodeBindings* node_bindings_;
+#endif
 
   DISALLOW_COPY_AND_ASSIGN(XWalkFrameHelper);
 };
@@ -130,7 +143,10 @@ void XWalkContentRendererClient::RenderThreadStarted() {
     extension_controller_.reset(
         new extensions::XWalkExtensionRendererController(this));
 
-  node_bindings_.reset(nodejs::NodeBindings::Create(false));
+#if defined(ENABLE_NODEJS)
+  // TODO: add "--nodejs"
+  node_bindings_.reset(nodejs::NodeBindings::Create());
+#endif
 
   blink::WebString application_scheme(
       base::ASCIIToUTF16(application::kApplicationScheme));
@@ -201,7 +217,11 @@ bool XWalkContentRendererClient::HandleNavigation(
 
 void XWalkContentRendererClient::RenderFrameCreated(
     content::RenderFrame* render_frame) {
+#if !defined(ENABLE_NODEJS)
+  new XWalkFrameHelper(render_frame, extension_controller_.get());
+#else
   new XWalkFrameHelper(render_frame, extension_controller_.get(), node_bindings_.get());
+#endif
 #if defined(OS_ANDROID)
   new XWalkPermissionClient(render_frame);
 #endif

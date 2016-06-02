@@ -22,8 +22,6 @@
         'node_bindings.h',
         'node_bindings_linux.cc',
         'node_bindings_linux.h',
-        'node_bindings_mac.cc',
-        'node_bindings_mac.h',
         'node_bindings_win.cc',
         'node_bindings_win.h',
         'node_includes.h',

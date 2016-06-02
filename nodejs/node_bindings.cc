@@ -2,6 +2,11 @@
 // Use of this source code is governed by the MIT license that can be
 // found in the LICENSE file.
 
+// The Crosswalk adaption code is under:
+// Copyright (c) 2016 Intel Corporation. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 #include "xwalk/nodejs/node_bindings.h"
 
 #include <string>
@@ -68,9 +73,8 @@ base::FilePath GetResourcesPath(bool is_browser) {
 
 }  // namespace
 
-NodeBindings::NodeBindings(bool is_browser)
-    : is_browser_(is_browser),
-      message_loop_(nullptr),
+NodeBindings::NodeBindings()
+    : message_loop_(nullptr),
       uv_loop_(uv_default_loop()),
       embed_closed_(false),
       uv_env_(nullptr),
@@ -125,20 +129,12 @@ void NodeBindings::WillReleaseScriptContext(
 
 void NodeBindings::Initialize() {
   // Open node's error reporting system for browser process.
-  node::g_standalone_mode = is_browser_;
+  node::g_standalone_mode = false;
   node::g_upstream_node_mode = false;
 
   // Init node.
   // (we assume node::Init would not modify the parameters under embedded mode).
   node::Init(nullptr, nullptr, nullptr, nullptr);
-
-#if defined(OS_WIN)
-  // uv_init overrides error mode to suppress the default crash dialog, bring
-  // it back if user wants to show it.
-  std::unique_ptr<base::Environment> env(base::Environment::Create());
-  if (env->HasVar("ELECTRON_DEFAULT_ERROR_MODE"))
-    SetErrorMode(0);
-#endif
 }
 
 node::Environment* NodeBindings::CreateEnvironment(
@@ -168,8 +164,6 @@ void NodeBindings::LoadEnvironment(node::Environment* env) {
 }
 
 void NodeBindings::PrepareMessageLoop() {
-  DCHECK(!is_browser_ || BrowserThread::CurrentlyOn(BrowserThread::UI));
-
   // Add dummy handle for libuv, otherwise libuv would quit when there is
   // nothing to do.
   uv_async_init(uv_loop_, &dummy_uv_handle_, UvNoOp);
@@ -180,8 +174,6 @@ void NodeBindings::PrepareMessageLoop() {
 }
 
 void NodeBindings::RunMessageLoop() {
-  DCHECK(!is_browser_ || BrowserThread::CurrentlyOn(BrowserThread::UI));
-
   // The MessageLoop should have been created, remember the one in main thread.
   message_loop_ = base::MessageLoop::current();
 
@@ -190,8 +182,6 @@ void NodeBindings::RunMessageLoop() {
 }
 
 void NodeBindings::UvRunOnce() {
-  DCHECK(!is_browser_ || BrowserThread::CurrentlyOn(BrowserThread::UI));
-
   node::Environment* env = uv_env();
   CHECK(env);
 
@@ -200,7 +190,7 @@ void NodeBindings::UvRunOnce() {
   // Enter node context while dealing with uv events.
   v8::Context::Scope context_scope(env->context());
 
-  /*
+  /* TODO: m51 API
   // Perform microtask checkpoint after running JavaScript.
   std::unique_ptr<v8::MicrotasksScope> script_scope(is_browser_ ?
       nullptr :

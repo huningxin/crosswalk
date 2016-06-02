@@ -2,7 +2,12 @@
 // Use of this source code is governed by the MIT license that can be
 // found in the LICENSE file.
 
-#include "atom/common/node_bindings_win.h"
+// The Crosswalk adaption code is under:
+// Copyright (c) 2016 Intel Corporation. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+#include "xwalk/nodejs/node_bindings_win.h"
 
 #include <windows.h>
 
@@ -12,10 +17,12 @@ extern "C" {
 #include "vendor/node/deps/uv/src/win/internal.h"
 }
 
-namespace atom {
+namespace xwalk {
 
-NodeBindingsWin::NodeBindingsWin(bool is_browser)
-    : NodeBindings(is_browser) {
+namespace nodejs {
+
+NodeBindingsWin::NodeBindingsWin()
+    : NodeBindings() {
 }
 
 NodeBindingsWin::~NodeBindingsWin() {
@@ -45,8 +52,10 @@ void NodeBindingsWin::PollEvents() {
 }
 
 // static
-NodeBindings* NodeBindings::Create(bool is_browser) {
-  return new NodeBindingsWin(is_browser);
+NodeBindings* NodeBindings::Create() {
+  return new NodeBindingsWin();
 }
 
-}  // namespace atom
+}  // namespace nodejs
+
+}  // namespace xwalk
