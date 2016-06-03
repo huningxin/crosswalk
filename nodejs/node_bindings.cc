@@ -18,6 +18,7 @@
 #include "base/files/file_path.h"
 #include "base/message_loop/message_loop.h"
 #include "base/path_service.h"
+#include "base/strings/string16.h"
 #include "content/public/browser/browser_thread.h"
 #include "content/public/common/content_paths.h"
 #include "third_party/WebKit/public/web/WebScopedMicrotaskSuppression.h"
@@ -44,6 +45,28 @@ namespace {
 
 // Empty callback for async handle.
 void UvNoOp(uv_async_t* handle) {
+}
+
+// Emit
+
+using ValueVector = std::vector<v8::Local<v8::Value>>;
+
+v8::Local<v8::Value> CallEmitWithArgs(v8::Isolate* isolate,
+                                      v8::Local<v8::Object> obj,
+                                      ValueVector* args) {
+  // Perform microtask checkpoint after running JavaScript.
+  /*
+  std::unique_ptr<v8::MicrotasksScope> script_scope(
+      Locker::IsBrowserProcess() ?
+          nullptr :
+          new v8::MicrotasksScope(isolate,
+                                  v8::MicrotasksScope::kRunMicrotasks));
+  */
+  blink::WebScopedMicrotaskSuppression suppression;
+  // Use node::MakeCallback to call the callback, and it will also run pending
+  // tasks in Node.js.
+  return node::MakeCallback(
+      isolate, obj, "emit", args->size(), &args->front());
 }
 
 // Convert the given vector to an array of C-strings. The strings in the
@@ -111,8 +134,11 @@ void NodeBindings::DidCreateScriptContext(
 
 void NodeBindings::WillReleaseScriptContext(
     blink::WebLocalFrame* frame, v8::Handle<v8::Context> context) {
-  //node::Environment* env = node::Environment::GetCurrent(context);
-  //mate::EmitEvent(env->isolate(), env->process_object(), "exit");
+  node::Environment* env = node::Environment::GetCurrent(context);
+  ValueVector args = {
+      v8::String::NewFromUtf8(env->isolate(), "exit") };
+
+  CallEmitWithArgs(env->isolate(), env->process_object(), &args);
 }
 
 void NodeBindings::Initialize() {
@@ -156,7 +182,6 @@ node::Environment* NodeBindings::CreateEnvironment(
 
 void NodeBindings::LoadEnvironment(node::Environment* env) {
   node::LoadEnvironment(env);
-  //mate::EmitEvent(env->isolate(), env->process_object(), "loaded");
 }
 
 void NodeBindings::PrepareMessageLoop() {

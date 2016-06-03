@@ -152,8 +152,10 @@ void XWalkContentRendererClient::RenderThreadStarted() {
     GURL::GURL url(base::CommandLine::ForCurrentProcess()->GetSwitchValueNative(
         switches::kStartupUrl));
     bool is_local = url.SchemeIsFile() && net::FileURLToFilePath(url, &path);
-    if (is_local)
+    if (is_local) {
+      nodejs::OverrideNodeArrayBuffer();
       node_bindings_.reset(nodejs::NodeBindings::Create(path));
+    }
   }
 #endif
 

@@ -18,6 +18,7 @@
 #include "ui/base/page_transition_types.h"
 #include "xwalk/extensions/renderer/xwalk_extension_renderer_controller.h"
 #if defined(ENABLE_NODEJS)
+#include "xwalk/nodejs/node_array_buffer_bridge.h"
 #include "xwalk/nodejs/node_bindings.h"
 #endif
 #if defined(OS_ANDROID)

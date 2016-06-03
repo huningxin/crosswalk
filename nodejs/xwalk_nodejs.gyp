@@ -23,6 +23,8 @@
         '<(SHARED_INTERMEDIATE_DIR)',
       ],
       'sources': [
+        'node_array_buffer_bridge.cc',
+        'node_array_buffer_bridge.h',
         'node_bindings.cc',
         'node_bindings.h',
         'node_bindings_linux.cc',
