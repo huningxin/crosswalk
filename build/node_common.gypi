@@ -191,11 +191,27 @@
             ],
           }],
           ['OS=="linux"', {
-            # Prevent the linker from stripping symbols.
-            'ldflags': [
-              '-Wl,--whole-archive',
-              'lib/libv8.so',
-              '-Wl,--no-whole-archive',
+            'conditions': [
+              ['component=="static_library"', {
+                # Prevent the linker from stripping symbols.
+                'ldflags': [
+                  '-Wl,--whole-archive',
+                  'obj/v8/tools/gyp/libv8_libplatform.a',
+                  'obj/v8/tools/gyp/libv8_external_snapshot.a',
+                  'obj/v8/tools/gyp/libv8_base.a',
+                  'obj/v8/tools/gyp/libv8_libbase.a',
+                  #'obj/v8/tools/gyp/libv8_nosnapshot.a',
+                  '-Wl,--no-whole-archive',
+                ],
+              }, {
+                # Prevent the linker from stripping symbols.
+                'ldflags': [
+                  '-Wl,--whole-archive',
+                  'lib/libv8.so',
+                  #'obj/v8/tools/gyp/libv8_nosnapshot.a',
+                  '-Wl,--no-whole-archive',
+                ],
+              }],
             ],
           }, {
             'libraries': [ 'v8' ],
