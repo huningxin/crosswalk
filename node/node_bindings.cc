@@ -7,7 +7,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "xwalk/nodejs/node_bindings.h"
+#include "xwalk/node/node_bindings.h"
 
 #include <string>
 #include <vector>
@@ -23,7 +23,7 @@
 #include "content/public/common/content_paths.h"
 #include "third_party/WebKit/public/web/WebScopedMicrotaskSuppression.h"
 #include "xwalk/runtime/common/xwalk_switches.h"
-#include "xwalk/nodejs/node_includes.h"
+#include "xwalk/node/node_includes.h"
 
 #include "xwalk_node_natives.h"  // NOLINT
 

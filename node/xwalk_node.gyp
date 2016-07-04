@@ -4,12 +4,12 @@
       'variables': {
         'chromium_code': 1,
       },
-      'target_name': 'xwalk_nodejs',
+      'target_name': 'xwalk_node',
       'type': 'static_library',
       'dependencies': [
         'xwalk_node_js2c',
       ],
-      'defines': ['ENABLE_NODEJS'],
+      'defines': ['ENABLE_NODE'],
       'include_dirs': [
         '..',
         '../..',

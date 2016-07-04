@@ -61,9 +61,9 @@ const char kPpapiFlashPath[] = "ppapi-flash-path";
 const char kPpapiFlashVersion[] = "ppapi-flash-version";
 #endif
 
-#if defined(ENABLE_NODEJS)
-// Enable the nodejs for renderer. Need the "--no-sandbox" swtich.
-const char kXWalkEnableNodeJs[] = "enable-nodejs";
+#if defined(ENABLE_NODE)
+// Enable the node for renderer. Need the "--no-sandbox" swtich.
+const char kXwalkEnableNode[] = "enable-node";
 
 // Use this path to set the nodejs module search path.
 const char kStartupUrl[] = "startup-url";

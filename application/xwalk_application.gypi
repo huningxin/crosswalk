@@ -43,8 +43,8 @@
         '../..',
       ],
       'conditions': [
-        ['enable_nodejs==1', {
-            'defines': ['ENABLE_NODEJS'],
+        ['enable_node==1', {
+            'defines': ['ENABLE_NODE'],
         }],
       ],
     },

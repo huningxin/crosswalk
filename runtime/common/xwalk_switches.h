@@ -33,8 +33,8 @@ extern const char kPpapiFlashPath[];
 extern const char kPpapiFlashVersion[];
 #endif
 
-#if defined(ENABLE_NODEJS)
-extern const char kXWalkEnableNodeJs[];
+#if defined(ENABLE_NODE)
+extern const char kXwalkEnableNode[];
 extern const char kStartupUrl[];
 #endif
 

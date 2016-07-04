@@ -17,9 +17,9 @@
 #include "media/base/key_system_info.h"
 #include "ui/base/page_transition_types.h"
 #include "xwalk/extensions/renderer/xwalk_extension_renderer_controller.h"
-#if defined(ENABLE_NODEJS)
-#include "xwalk/nodejs/node_array_buffer_bridge.h"
-#include "xwalk/nodejs/node_bindings.h"
+#if defined(ENABLE_NODE)
+#include "xwalk/node/node_array_buffer_bridge.h"
+#include "xwalk/node/node_bindings.h"
 #endif
 #if defined(OS_ANDROID)
 #include "xwalk/runtime/renderer/android/xwalk_render_process_observer.h"
@@ -86,7 +86,7 @@ class XWalkContentRendererClient
   scoped_ptr<extensions::XWalkExtensionRendererController>
       extension_controller_;
 
-#if defined(ENABLE_NODEJS)
+#if defined(ENABLE_NODE)
   scoped_ptr<nodejs::NodeBindings> node_bindings_;
 #endif
 

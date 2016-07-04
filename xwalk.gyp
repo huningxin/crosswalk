@@ -367,11 +367,11 @@
         },
       },
       'conditions': [
-        ['enable_nodejs==1', {
-          'defines': ['ENABLE_NODEJS'],
+        ['enable_node==1', {
+          'defines': ['ENABLE_NODE'],
           'dependencies': [
             '../third_party/node/node.gyp:node',
-            'nodejs/xwalk_nodejs.gyp:xwalk_nodejs',
+            'node/xwalk_node.gyp:xwalk_node',
           ],
         }],
         ['OS=="android"',{

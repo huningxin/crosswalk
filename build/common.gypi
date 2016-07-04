@@ -148,10 +148,10 @@
     'xwalk_core_library_artifact_id%': 'xwalk_core_library_canary',
     'xwalk_shared_library_artifact_id%': 'xwalk_shared_library_canary',
 
-    'enable_nodejs%': 0,
+    'enable_node%': 0,
   },
   'conditions': [
-    ['enable_nodejs==1', {
+    ['enable_node==1', {
       'includes': [
         'node_common.gypi',
       ],

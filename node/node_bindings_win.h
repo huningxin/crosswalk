@@ -11,7 +11,7 @@
 #define XWALK_NODEJS_NODE_BINDINGS_WIN_H_
 
 #include "base/compiler_specific.h"
-#include "xwalk/nodejs/node_bindings.h"
+#include "xwalk/node/node_bindings.h"
 
 namespace xwalk {
 

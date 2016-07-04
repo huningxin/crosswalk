@@ -68,7 +68,7 @@ class XWalkFrameHelper
       : content::RenderFrameObserver(render_frame),
         content::RenderFrameObserverTracker<XWalkFrameHelper>(render_frame),
         extension_controller_(extension_controller) {}
-#if defined(ENABLE_NODEJS)
+#if defined(ENABLE_NODE)
   XWalkFrameHelper(
       content::RenderFrame* render_frame,
       extensions::XWalkExtensionRendererController* extension_controller,
@@ -87,7 +87,7 @@ class XWalkFrameHelper
       extension_controller_->DidCreateScriptContext(
           render_frame()->GetWebFrame(), context);
 
-#if defined(ENABLE_NODEJS)
+#if defined(ENABLE_NODE)
     if (node_bindings_)
       node_bindings_->DidCreateScriptContext(
           render_frame()->GetWebFrame(), context);
@@ -98,7 +98,7 @@ class XWalkFrameHelper
     if (extension_controller_)
       extension_controller_->WillReleaseScriptContext(
           render_frame()->GetWebFrame(), context);
-#if defined(ENABLE_NODEJS)
+#if defined(ENABLE_NODE)
     if (node_bindings_)
       node_bindings_->WillReleaseScriptContext(
           render_frame()->GetWebFrame(), context);
@@ -107,7 +107,7 @@ class XWalkFrameHelper
 
  private:
   extensions::XWalkExtensionRendererController* extension_controller_;
-#if defined(ENABLE_NODEJS)
+#if defined(ENABLE_NODE)
   nodejs::NodeBindings* node_bindings_;
 #endif
 
@@ -146,8 +146,8 @@ void XWalkContentRendererClient::RenderThreadStarted() {
     extension_controller_.reset(
         new extensions::XWalkExtensionRendererController(this));
 
-#if defined(ENABLE_NODEJS)
-  if (cmd_line->HasSwitch(switches::kXWalkEnableNodeJs)) {
+#if defined(ENABLE_NODE)
+  if (cmd_line->HasSwitch(switches::kXwalkEnableNode)) {
     base::FilePath path;
     GURL::GURL url(base::CommandLine::ForCurrentProcess()->GetSwitchValueNative(
         switches::kStartupUrl));
@@ -228,7 +228,7 @@ bool XWalkContentRendererClient::HandleNavigation(
 
 void XWalkContentRendererClient::RenderFrameCreated(
     content::RenderFrame* render_frame) {
-#if !defined(ENABLE_NODEJS)
+#if !defined(ENABLE_NODE)
   new XWalkFrameHelper(render_frame, extension_controller_.get());
 #else
   new XWalkFrameHelper(render_frame, extension_controller_.get(), node_bindings_.get());

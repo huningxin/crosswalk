@@ -161,8 +161,8 @@ void XWalkContentBrowserClient::AppendExtraCommandLineSwitches(
       *base::CommandLine::ForCurrentProcess();
   const char* extra_switches[] = {
     switches::kXWalkDisableExtensionProcess,
-#if defined(ENABLE_NODEJS)
-    switches::kXWalkEnableNodeJs,
+#if defined(ENABLE_NODE)
+    switches::kXwalkEnableNode,
     switches::kStartupUrl,
 #endif
 #if defined(ENABLE_PLUGINS)
