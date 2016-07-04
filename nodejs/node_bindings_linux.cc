@@ -30,8 +30,8 @@ NodeBindingsLinux::~NodeBindingsLinux() {
 
 void NodeBindingsLinux::RunMessageLoop() {
   // Get notified when libuv's watcher queue changes.
-  uv_loop_->data = this;
-  uv_loop_->on_watcher_queue_updated = OnWatcherQueueChanged;
+  //uv_loop_->data = this;
+  //uv_loop_->on_watcher_queue_updated = OnWatcherQueueChanged;
 
   NodeBindings::RunMessageLoop();
 }

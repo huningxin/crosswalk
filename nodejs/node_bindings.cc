@@ -44,8 +44,8 @@ namespace nodejs {
 namespace {
 
 // Empty callback for async handle.
-void UvNoOp(uv_async_t* handle) {
-}
+//void UvNoOp(uv_async_t* handle) {
+//}
 
 // Emit
 
@@ -187,7 +187,7 @@ void NodeBindings::LoadEnvironment(node::Environment* env) {
 void NodeBindings::PrepareMessageLoop() {
   // Add dummy handle for libuv, otherwise libuv would quit when there is
   // nothing to do.
-  uv_async_init(uv_loop_, &dummy_uv_handle_, UvNoOp);
+  //uv_async_init(uv_loop_, &dummy_uv_handle_, UvNoOp);
 
   // Start worker that will interrupt main loop when having uv events.
   uv_sem_init(&embed_sem_, 0);
