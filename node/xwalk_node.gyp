@@ -25,13 +25,10 @@
       'sources': [
         'node_array_buffer_bridge.cc',
         'node_array_buffer_bridge.h',
-        'node_bindings.cc',
-        'node_bindings.h',
-        'node_bindings_linux.cc',
-        'node_bindings_linux.h',
-        'node_bindings_win.cc',
-        'node_bindings_win.h',
         'node_includes.h',
+        'xwalk_node_renderer_controller.cc',
+        'xwalk_node_renderer_controller.h',
+
       ],
     },
     {

@@ -72,11 +72,11 @@ class XWalkFrameHelper
   XWalkFrameHelper(
       content::RenderFrame* render_frame,
       extensions::XWalkExtensionRendererController* extension_controller,
-      nodejs::NodeBindings* node_bindings)
+      node::XwalkNodeRendererController* node_controller)
       : content::RenderFrameObserver(render_frame),
         content::RenderFrameObserverTracker<XWalkFrameHelper>(render_frame),
         extension_controller_(extension_controller),
-        node_bindings_(node_bindings) {}
+        node_controller_(node_controller) {}
 #endif
   ~XWalkFrameHelper() override {}
 
@@ -88,8 +88,8 @@ class XWalkFrameHelper
           render_frame()->GetWebFrame(), context);
 
 #if defined(ENABLE_NODE)
-    if (node_bindings_)
-      node_bindings_->DidCreateScriptContext(
+    if (node_controller_)
+      node_controller_->DidCreateScriptContext(
           render_frame()->GetWebFrame(), context);
 #endif
   }
@@ -99,8 +99,8 @@ class XWalkFrameHelper
       extension_controller_->WillReleaseScriptContext(
           render_frame()->GetWebFrame(), context);
 #if defined(ENABLE_NODE)
-    if (node_bindings_)
-      node_bindings_->WillReleaseScriptContext(
+    if (node_controller_)
+      node_controller_->WillReleaseScriptContext(
           render_frame()->GetWebFrame(), context);
 #endif
   }
@@ -108,7 +108,7 @@ class XWalkFrameHelper
  private:
   extensions::XWalkExtensionRendererController* extension_controller_;
 #if defined(ENABLE_NODE)
-  nodejs::NodeBindings* node_bindings_;
+  node::XwalkNodeRendererController* node_controller_;
 #endif
 
   DISALLOW_COPY_AND_ASSIGN(XWalkFrameHelper);
@@ -154,7 +154,7 @@ void XWalkContentRendererClient::RenderThreadStarted() {
     bool is_local = url.SchemeIsFile() && net::FileURLToFilePath(url, &path);
     if (is_local) {
       nodejs::OverrideNodeArrayBuffer();
-      node_bindings_.reset(nodejs::NodeBindings::Create(path));
+      node_controller_.reset(new node::XwalkNodeRendererController(path));
     }
   }
 #endif
@@ -231,7 +231,7 @@ void XWalkContentRendererClient::RenderFrameCreated(
 #if !defined(ENABLE_NODE)
   new XWalkFrameHelper(render_frame, extension_controller_.get());
 #else
-  new XWalkFrameHelper(render_frame, extension_controller_.get(), node_bindings_.get());
+  new XWalkFrameHelper(render_frame, extension_controller_.get(), node_controller_.get());
 #endif
 #if defined(OS_ANDROID)
   new XWalkPermissionClient(render_frame);

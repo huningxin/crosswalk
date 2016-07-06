@@ -19,7 +19,7 @@
 #include "xwalk/extensions/renderer/xwalk_extension_renderer_controller.h"
 #if defined(ENABLE_NODE)
 #include "xwalk/node/node_array_buffer_bridge.h"
-#include "xwalk/node/node_bindings.h"
+#include "xwalk/node/xwalk_node_renderer_controller.h"
 #endif
 #if defined(OS_ANDROID)
 #include "xwalk/runtime/renderer/android/xwalk_render_process_observer.h"
@@ -87,7 +87,7 @@ class XWalkContentRendererClient
       extension_controller_;
 
 #if defined(ENABLE_NODE)
-  scoped_ptr<nodejs::NodeBindings> node_bindings_;
+  scoped_ptr<node::XwalkNodeRendererController> node_controller_;
 #endif
 
 #if defined(OS_ANDROID)
