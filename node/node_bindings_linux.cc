@@ -18,11 +18,13 @@ namespace nodejs {
 NodeBindingsLinux::NodeBindingsLinux(base::FilePath& manifest_path)
     : NodeBindings(manifest_path),
       epoll_(epoll_create(1)) {
+        /*
   int backend_fd = uv_backend_fd(uv_loop_);
   struct epoll_event ev = { 0 };
   ev.events = EPOLLIN;
   ev.data.fd = backend_fd;
   epoll_ctl(epoll_, EPOLL_CTL_ADD, backend_fd, &ev);
+  */
 }
 
 NodeBindingsLinux::~NodeBindingsLinux() {
@@ -47,12 +49,13 @@ void NodeBindingsLinux::OnWatcherQueueChanged(uv_loop_t* loop) {
 
 void NodeBindingsLinux::PollEvents() {
   int timeout = uv_backend_timeout(uv_loop_);
+  int fd = uv_backend_fd(uv_loop_);
 
   // Wait for new libuv events.
   int r;
   do {
     struct epoll_event ev;
-    r = epoll_wait(epoll_, &ev, 1, timeout);
+    r = epoll_wait(fd, &ev, 1, timeout);
   } while (r == -1 && errno == EINTR);
 }
 
