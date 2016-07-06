@@ -108,7 +108,7 @@ void XwalkNodeRendererController::DidCreateScriptContext(
   // Setup the process object.
   node_env_->process_object()->DefineOwnProperty(
       node_env_->context(),
-      v8::String::NewFromUtf8(node_env_->isolate(), "_init_native"),
+      v8::String::NewFromUtf8(node_env_->isolate(), "_eval"),
       v8::String::NewFromUtf8(
           node_env_->isolate(),
           reinterpret_cast<const char*>(::node::init_native),

@@ -2,7 +2,7 @@
 
 // reset-search-path.js
 
-const path = require('path');
+const Path = require('path');
 const Module = require('module');
 
 // Clear Node's global search paths.
@@ -13,7 +13,7 @@ module.paths = [];
 
 // Prevent Node from adding paths outside this app to search paths.
 Module._nodeModulePaths = function (from) {
-  from = path.resolve(from)
+  from = Path.resolve(from)
 
   // If "from" is outside the app then we do nothing.
   const skipOutsidePaths = from.startsWith(process._app_manifest_path)
@@ -30,19 +30,13 @@ Module._nodeModulePaths = function (from) {
     if (part === 'node_modules') {
       continue
     }
-    const dir = parts.slice(0, tip + 1).join(path.sep)
+    const dir = parts.slice(0, tip + 1).join(Path.sep)
     if (skipOutsidePaths && !dir.startsWith(process._app_manifest_path)) {
       break
     }
-    paths.push(path.join(dir, 'node_modules'))
+    paths.push(Path.join(dir, 'node_modules'))
   }
   return paths
 }
 
-// renderer/init.js
-global.require = require;
-global.module = module;
-global.__filename = __filename;
-global.__dirname = __dirname;
-
-return exports;
+module.paths = Module._nodeModulePaths(process._app_manifest_path);
