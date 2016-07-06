@@ -26,7 +26,20 @@ namespace node {
 
 namespace {
 
-void UvDummyCallback(uv_async_t* handle) {
+void ActivateUvCallback(uv_async_t* handle) {
+  //printf("ActivateUvCallback\n");
+  ::node::Environment* env = static_cast<::node::Environment*>(handle->data);
+  // KickNextTick, copied from node.cc:
+  ::node::Environment::AsyncCallbackScope callback_scope(env);
+  if (callback_scope.in_makecallback())
+    return;
+  ::node::Environment::TickInfo* tick_info = env->tick_info();
+  if (tick_info->length() == 0)
+    env->isolate()->RunMicrotasks();
+  v8::Local<v8::Object> process = env->process_object();
+  if (tick_info->length() == 0)
+    tick_info->set_index(0);
+  env->tick_callback_function()->Call(process, 0, nullptr).IsEmpty();
 }
 
 // Convert the given vector to an array of C-strings. The strings in the
@@ -43,6 +56,8 @@ std::unique_ptr<const char*[]> StringVectorToArgArray(
 
 }  // namespace
 
+uv_async_t uv_activate_async_;
+
 XwalkNodeRendererController::XwalkNodeRendererController(
     base::FilePath& manifest_path)
     : message_loop_(nullptr),
@@ -57,9 +72,15 @@ XwalkNodeRendererController::~XwalkNodeRendererController() {
   // Stop the uv polling thread.
   uv_polling_stopped_ = true;
   uv_sem_post(&uv_polling_sem_);
-  uv_async_send(&uv_dummy_async_);
+  uv_async_send(&uv_activate_async_);
   uv_thread_join(&uv_polling_thread_);
   uv_sem_destroy(&uv_polling_sem_);
+}
+
+void ActivateUvLoop(const v8::FunctionCallbackInfo<v8::Value>& args) {
+  ::node::Environment* env = ::node::Environment::GetCurrent(args);
+  uv_async_send(&uv_activate_async_);
+  uv_activate_async_.data = env;
 }
 
 void XwalkNodeRendererController::DidCreateScriptContext(
@@ -68,7 +89,7 @@ void XwalkNodeRendererController::DidCreateScriptContext(
   ::node::Init(nullptr, nullptr, nullptr, nullptr);
 
   // Add dummy callback to avoid spin on uv backend fd.
-  uv_async_init(uv_loop_, &uv_dummy_async_, UvDummyCallback);
+  uv_async_init(uv_loop_, &uv_activate_async_, ActivateUvCallback);
 
   // Create the uv polling thread and semaphore.
   uv_sem_init(&uv_polling_sem_, 0);
@@ -99,6 +120,10 @@ void XwalkNodeRendererController::DidCreateScriptContext(
       v8::String::NewFromUtf8(
           node_env_->isolate(),
           manifest_path_.DirName().MaybeAsASCII().c_str())).FromJust();
+
+  node_env_->SetMethod(node_env_->process_object(),
+                       "activateUvLoop",
+                       ActivateUvLoop);
 
   // Execute node.js in this envrionment.
   ::node::LoadEnvironment(node_env_);

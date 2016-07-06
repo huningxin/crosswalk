@@ -48,7 +48,7 @@ class XwalkNodeRendererController {
 
   // Members for uv event loop.
   uv_loop_t* uv_loop_;
-  uv_async_t uv_dummy_async_;
+  //uv_async_t uv_dummy_async_;
   bool uv_polling_stopped_;
   uv_thread_t uv_polling_thread_;
   uv_sem_t uv_polling_sem_;
