@@ -1,4 +1,3 @@
-// The Crosswalk adaption code is under:
 // Copyright (c) 2016 Intel Corporation. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -7,24 +6,19 @@
 
 #include <string>
 #include <vector>
+
+#if defined(OS_LINUX)
 #include <sys/epoll.h>
+#endif
 
 #include "base/command_line.h"
-#include "base/base_paths.h"
-#include "base/environment.h"
-#include "base/files/file_path.h"
+#include "base/bind.h"
 #include "base/message_loop/message_loop.h"
-#include "base/path_service.h"
-#include "base/strings/string16.h"
-#include "content/public/browser/browser_thread.h"
-#include "content/public/common/content_paths.h"
 #include "third_party/WebKit/public/web/WebScopedMicrotaskSuppression.h"
-#include "xwalk/runtime/common/xwalk_switches.h"
 #include "xwalk/node/node_includes.h"
+#include "xwalk/runtime/common/xwalk_switches.h"
 
 #include "xwalk_node_natives.h"  // NOLINT
-
-using content::BrowserThread;
 
 namespace xwalk {
 
