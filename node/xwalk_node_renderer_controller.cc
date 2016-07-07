@@ -105,7 +105,15 @@ void XwalkNodeRendererController::DidCreateScriptContext(
       context->GetIsolate(), uv_default_loop(), context,
       args.size(), c_argv.get(), 0, nullptr);
 
-  // Setup the process object.
+  // Expose the app root path to process object.
+  node_env_->process_object()->DefineOwnProperty(
+      node_env_->context(),
+      v8::String::NewFromUtf8(node_env_->isolate(), "_app_manifest_path"),
+      v8::String::NewFromUtf8(
+          node_env_->isolate(),
+          manifest_path_.DirName().MaybeAsASCII().c_str())).FromJust();
+
+  // Set init.js as eval script when executing node.js.
   node_env_->process_object()->DefineOwnProperty(
       node_env_->context(),
       v8::String::NewFromUtf8(node_env_->isolate(), "_eval"),
@@ -114,12 +122,6 @@ void XwalkNodeRendererController::DidCreateScriptContext(
           reinterpret_cast<const char*>(::node::init_native),
           v8::NewStringType::kNormal,
           sizeof(::node::init_native)).ToLocalChecked()).FromJust();
-  node_env_->process_object()->DefineOwnProperty(
-      node_env_->context(),
-      v8::String::NewFromUtf8(node_env_->isolate(), "_app_manifest_path"),
-      v8::String::NewFromUtf8(
-          node_env_->isolate(),
-          manifest_path_.DirName().MaybeAsASCII().c_str())).FromJust();
 
   node_env_->SetMethod(node_env_->process_object(),
                        "activateUvLoop",
