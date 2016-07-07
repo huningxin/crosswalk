@@ -49,7 +49,7 @@ XwalkNodeRendererController::~XwalkNodeRendererController() {
 // static
 void XwalkNodeRendererController::WakeupUvLoopCallback(uv_async_t* handle) {
   ::node::Environment* env = static_cast<::node::Environment*>(handle->data);
-  // Execute copied from node.cc:
+  // This is a chance to kick next ticks.
   ::node::Environment::AsyncCallbackScope callback_scope(env);
   if (callback_scope.in_makecallback())
     return;
@@ -74,7 +74,7 @@ void XwalkNodeRendererController::Init() {
   // Init node with nullptr means embedding mode.
   ::node::Init(nullptr, nullptr, nullptr, nullptr);
 
-  // Add dummy callback to avoid spin on uv backend fd.
+  // Add wakup uv callback to avoid spin on uv backend fd.
   uv_async_init(uv_loop_, &uv_wakeup_async_, WakeupUvLoopCallback);
 
   // Create the uv polling thread and semaphore.
