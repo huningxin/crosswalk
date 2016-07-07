@@ -38,7 +38,7 @@
         {
           'action_name': 'xwalk_node_js2c',
           'inputs': [
-            'init.js',
+            'xwalk_node_init.js',
           ],
           'outputs': [
             '<(SHARED_INTERMEDIATE_DIR)/xwalk_node_natives.h',

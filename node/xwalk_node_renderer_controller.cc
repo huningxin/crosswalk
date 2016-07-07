@@ -15,7 +15,7 @@
 #include "base/bind.h"
 #include "base/message_loop/message_loop.h"
 #include "third_party/WebKit/public/web/WebScopedMicrotaskSuppression.h"
-#include "xwalk/node/node_includes.h"
+#include "xwalk/node/xwalk_node_includes.h"
 #include "xwalk/runtime/common/xwalk_switches.h"
 
 #include "xwalk_node_natives.h"  // NOLINT
@@ -120,9 +120,9 @@ void XwalkNodeRendererController::DidCreateScriptContext(
       v8::String::NewFromUtf8(node_env_->isolate(), "_eval"),
       v8::String::NewFromUtf8(
           node_env_->isolate(),
-          reinterpret_cast<const char*>(::node::init_native),
+          reinterpret_cast<const char*>(::node::xwalk_node_init_native),
           v8::NewStringType::kNormal,
-          sizeof(::node::init_native)).ToLocalChecked()).FromJust();
+          sizeof(::node::xwalk_node_init_native)).ToLocalChecked()).FromJust();
 
   node_env_->SetMethod(node_env_->process_object(),
                        "wakeupUvLoop",

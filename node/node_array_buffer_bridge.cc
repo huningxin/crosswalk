@@ -10,7 +10,7 @@
 #include "xwalk/node/node_array_buffer_bridge.h"
 
 #include "base/macros.h"
-#include "xwalk/node/node_includes.h"
+#include "xwalk/node/xwalk_node_includes.h"
 #include "third_party/WebKit/public/web/WebArrayBuffer.h"
 #include "third_party/WebKit/public/web/WebArrayBufferConverter.h"
 
