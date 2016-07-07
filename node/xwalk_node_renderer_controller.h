@@ -37,18 +37,27 @@ class XwalkNodeRendererController {
                                 v8::Handle<v8::Context> context);
 
  private:
+  void Init();
+
   // Run the uv event loop without blocking.
   void RunUvLoopNonBlocking();
 
   // Poll the uv events in uv_polling_thread_.
   static void UvPollingThreadRunner(void *arg);
 
+  // Allow to wakup uv loop from JavaScript.
+  static void JsWakeupUvLoop(const v8::FunctionCallbackInfo<v8::Value>& args);
+  static void WakeupUvLoopCallback(uv_async_t* handle);
+  static uv_async_t uv_wakeup_async_;
+
+  // Initialize once;
+  bool initialized_;
+
   // Message loop of main thread.
   base::MessageLoop* message_loop_;
 
   // Members for uv event loop.
   uv_loop_t* uv_loop_;
-  //uv_async_t uv_dummy_async_;
   bool uv_polling_stopped_;
   uv_thread_t uv_polling_thread_;
   uv_sem_t uv_polling_sem_;

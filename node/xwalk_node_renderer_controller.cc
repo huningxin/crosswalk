@@ -24,12 +24,32 @@ namespace xwalk {
 
 namespace node {
 
-namespace {
+uv_async_t XwalkNodeRendererController::uv_wakeup_async_;
 
-void ActivateUvCallback(uv_async_t* handle) {
-  //printf("ActivateUvCallback\n");
+XwalkNodeRendererController::XwalkNodeRendererController(
+    base::FilePath& manifest_path)
+    : initialized_(false),
+      message_loop_(nullptr),
+      uv_loop_(uv_default_loop()),
+      uv_polling_stopped_(false),
+      node_env_(nullptr),
+      manifest_path_(manifest_path),
+      weak_factory_(this) {
+}
+
+XwalkNodeRendererController::~XwalkNodeRendererController() {
+  // Stop the uv polling thread.
+  uv_polling_stopped_ = true;
+  uv_sem_post(&uv_polling_sem_);
+  uv_async_send(&uv_wakeup_async_);
+  uv_thread_join(&uv_polling_thread_);
+  uv_sem_destroy(&uv_polling_sem_);
+}
+
+// static
+void XwalkNodeRendererController::WakeupUvLoopCallback(uv_async_t* handle) {
   ::node::Environment* env = static_cast<::node::Environment*>(handle->data);
-  // KickNextTick, copied from node.cc:
+  // Execute copied from node.cc:
   ::node::Environment::AsyncCallbackScope callback_scope(env);
   if (callback_scope.in_makecallback())
     return;
@@ -42,46 +62,35 @@ void ActivateUvCallback(uv_async_t* handle) {
   env->tick_callback_function()->Call(process, 0, nullptr).IsEmpty();
 }
 
-}  // namespace
-
-uv_async_t uv_activate_async_;
-
-XwalkNodeRendererController::XwalkNodeRendererController(
-    base::FilePath& manifest_path)
-    : message_loop_(nullptr),
-      uv_loop_(uv_default_loop()),
-      uv_polling_stopped_(false),
-      node_env_(nullptr),
-      manifest_path_(manifest_path),
-      weak_factory_(this) {
-}
-
-XwalkNodeRendererController::~XwalkNodeRendererController() {
-  // Stop the uv polling thread.
-  uv_polling_stopped_ = true;
-  uv_sem_post(&uv_polling_sem_);
-  uv_async_send(&uv_activate_async_);
-  uv_thread_join(&uv_polling_thread_);
-  uv_sem_destroy(&uv_polling_sem_);
-}
-
-void ActivateUvLoop(const v8::FunctionCallbackInfo<v8::Value>& args) {
+// static
+void XwalkNodeRendererController::JsWakeupUvLoop(
+    const v8::FunctionCallbackInfo<v8::Value>& args) {
   ::node::Environment* env = ::node::Environment::GetCurrent(args);
-  uv_async_send(&uv_activate_async_);
-  uv_activate_async_.data = env;
+  uv_wakeup_async_.data = env;
+  uv_async_send(&uv_wakeup_async_);
 }
 
-void XwalkNodeRendererController::DidCreateScriptContext(
-    blink::WebLocalFrame* frame, v8::Handle<v8::Context> context) {
+void XwalkNodeRendererController::Init() {
   // Init node with nullptr means embedding mode.
   ::node::Init(nullptr, nullptr, nullptr, nullptr);
 
   // Add dummy callback to avoid spin on uv backend fd.
-  uv_async_init(uv_loop_, &uv_activate_async_, ActivateUvCallback);
+  uv_async_init(uv_loop_, &uv_wakeup_async_, WakeupUvLoopCallback);
 
   // Create the uv polling thread and semaphore.
   uv_sem_init(&uv_polling_sem_, 0);
   uv_thread_create(&uv_polling_thread_, UvPollingThreadRunner, this);
+
+  // Keep the message loop of main thread.
+  message_loop_ = base::MessageLoop::current();
+
+  initialized_ = true;
+}
+
+void XwalkNodeRendererController::DidCreateScriptContext(
+    blink::WebLocalFrame* frame, v8::Handle<v8::Context> context) {
+  if (!initialized_)
+    Init();
 
   blink::WebScopedMicrotaskSuppression suppression;
   // TODO(nhu): use m51 V8 microtask API.
@@ -92,7 +101,7 @@ void XwalkNodeRendererController::DidCreateScriptContext(
   std::string exec_name("node");
   argv[0] = exec_name.c_str();
 
-  // Create the environment from DOM script context.
+  // Create the environment from each DOM script context.
   node_env_ = ::node::CreateEnvironment(
       context->GetIsolate(), uv_default_loop(), context,
       argc, argv, 0, nullptr);
@@ -116,14 +125,11 @@ void XwalkNodeRendererController::DidCreateScriptContext(
           sizeof(::node::init_native)).ToLocalChecked()).FromJust();
 
   node_env_->SetMethod(node_env_->process_object(),
-                       "activateUvLoop",
-                       ActivateUvLoop);
+                       "wakeupUvLoop",
+                       JsWakeupUvLoop);
 
   // Execute node.js in this envrionment.
   ::node::LoadEnvironment(node_env_);
-
-  // Keep the message loop of main thread.
-  message_loop_ = base::MessageLoop::current();
 
   // Run uv loop once.
   RunUvLoopNonBlocking();
