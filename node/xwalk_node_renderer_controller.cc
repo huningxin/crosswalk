@@ -42,18 +42,6 @@ void ActivateUvCallback(uv_async_t* handle) {
   env->tick_callback_function()->Call(process, 0, nullptr).IsEmpty();
 }
 
-// Convert the given vector to an array of C-strings. The strings in the
-// returned vector are only guaranteed valid so long as the vector of strings
-// is not modified.
-std::unique_ptr<const char*[]> StringVectorToArgArray(
-    const std::vector<std::string>& vector) {
-  std::unique_ptr<const char*[]> array(new const char*[vector.size()]);
-  for (size_t i = 0; i < vector.size(); ++i) {
-    array[i] = vector[i].c_str();
-  }
-  return array;
-}
-
 }  // namespace
 
 uv_async_t uv_activate_async_;
@@ -97,13 +85,17 @@ void XwalkNodeRendererController::DidCreateScriptContext(
 
   blink::WebScopedMicrotaskSuppression suppression;
   // TODO(nhu): use m51 V8 microtask API.
-  std::vector<std::string> args = base::CommandLine::ForCurrentProcess()->argv();
-  std::unique_ptr<const char*[]> c_argv = StringVectorToArgArray(args);
+
+  // Create the pesudo argv.
+  int argc = 1;
+  const char* argv[1];
+  std::string exec_name("node");
+  argv[0] = exec_name.c_str();
 
   // Create the environment from DOM script context.
   node_env_ = ::node::CreateEnvironment(
       context->GetIsolate(), uv_default_loop(), context,
-      args.size(), c_argv.get(), 0, nullptr);
+      argc, argv, 0, nullptr);
 
   // Expose the app root path to process object.
   node_env_->process_object()->DefineOwnProperty(
