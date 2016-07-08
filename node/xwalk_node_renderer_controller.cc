@@ -106,6 +106,12 @@ void XwalkNodeRendererController::DidCreateScriptContext(
       context->GetIsolate(), uv_default_loop(), context,
       argc, argv, 0, nullptr);
 
+  // Avoid override browser globals with node objects.
+  node_env_->process_object()->DefineOwnProperty(
+      node_env_->context(),
+      v8::String::NewFromUtf8(node_env_->isolate(), "_noBrowserGlobals"),
+      v8::True(node_env_->isolate())).FromJust();
+
   // Expose the app root path to process object.
   node_env_->process_object()->DefineOwnProperty(
       node_env_->context(),
@@ -124,8 +130,9 @@ void XwalkNodeRendererController::DidCreateScriptContext(
           v8::NewStringType::kNormal,
           sizeof(::node::xwalk_node_init_native)).ToLocalChecked()).FromJust();
 
+  // Allow JavaScript to wake the uv loop to execute WakeupUvLoopCallback.
   node_env_->SetMethod(node_env_->process_object(),
-                       "wakeupUvLoop",
+                       "_wakeupUvLoop",
                        JsWakeupUvLoop);
 
   // Execute node.js in this envrionment.
