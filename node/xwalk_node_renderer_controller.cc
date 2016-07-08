@@ -114,10 +114,10 @@ void XwalkNodeRendererController::DidCreateScriptContext(
           node_env_->isolate(),
           manifest_path_.DirName().MaybeAsASCII().c_str())).FromJust();
 
-  // Set init.js as eval script when executing node.js.
+  // Set xwalk_node_init.js as main module to node.js.
   node_env_->process_object()->DefineOwnProperty(
       node_env_->context(),
-      v8::String::NewFromUtf8(node_env_->isolate(), "_eval"),
+      v8::String::NewFromUtf8(node_env_->isolate(), "_xwalk_node_init"),
       v8::String::NewFromUtf8(
           node_env_->isolate(),
           reinterpret_cast<const char*>(::node::xwalk_node_init_native),
