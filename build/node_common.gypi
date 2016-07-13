@@ -208,7 +208,7 @@
                 'ldflags': [
                   '-Wl,--whole-archive',
                   'lib/libv8.so',
-                  #'obj/v8/tools/gyp/libv8_nosnapshot.a',
+                  'obj/v8/tools/gyp/libv8_libplatform.a',
                   '-Wl,--no-whole-archive',
                 ],
               }],

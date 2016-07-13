@@ -153,7 +153,6 @@ void XWalkContentRendererClient::RenderThreadStarted() {
         switches::kStartupUrl));
     bool is_local = url.SchemeIsFile() && net::FileURLToFilePath(url, &path);
     if (is_local) {
-      nodejs::OverrideNodeArrayBuffer();
       node_controller_.reset(new node::XwalkNodeRendererController(path));
     }
   }

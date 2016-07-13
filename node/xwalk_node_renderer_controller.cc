@@ -71,8 +71,7 @@ void XwalkNodeRendererController::JsWakeupUvLoop(
 }
 
 void XwalkNodeRendererController::Init() {
-  // Init node with nullptr means embedding mode.
-  ::node::Init(nullptr, nullptr, nullptr, nullptr);
+  ::node::XwalkEmbedInit();
 
   // Add wakup uv callback to avoid spin on uv backend fd.
   uv_async_init(uv_loop_, &uv_wakeup_async_, WakeupUvLoopCallback);

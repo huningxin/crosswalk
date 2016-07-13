@@ -23,12 +23,9 @@
         '<(SHARED_INTERMEDIATE_DIR)',
       ],
       'sources': [
-        'node_array_buffer_bridge.cc',
-        'node_array_buffer_bridge.h',
         'node_includes.h',
         'xwalk_node_renderer_controller.cc',
         'xwalk_node_renderer_controller.h',
-
       ],
     },
     {
