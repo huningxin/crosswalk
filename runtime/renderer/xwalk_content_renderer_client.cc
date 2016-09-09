@@ -149,9 +149,15 @@ void XWalkContentRendererClient::RenderThreadStarted() {
 #if defined(ENABLE_NODE)
   if (cmd_line->HasSwitch(switches::kXwalkEnableNode)) {
     base::FilePath path;
-    GURL::GURL url(base::CommandLine::ForCurrentProcess()->GetSwitchValueNative(
+    GURL url(base::CommandLine::ForCurrentProcess()->GetSwitchValueNative(
         switches::kStartupUrl));
+#if defined(OS_LINUX)
     bool is_local = url.SchemeIsFile() && net::FileURLToFilePath(url, &path);
+#endif
+#if defined(OS_ANDROID)
+    //TODO: Workout how to pass manifest file.
+    bool is_local = true;
+#endif
     if (is_local) {
       node_controller_.reset(new node::XwalkNodeRendererController(path));
     }
