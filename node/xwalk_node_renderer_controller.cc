@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#if defined(OS_LINUX)
+#if defined(OS_ANDROID) || defined(OS_LINUX)
 #include <sys/epoll.h>
 #endif
 
@@ -179,7 +179,7 @@ void XwalkNodeRendererController::UvPollingThreadRunner(void *arg) {
       static_cast<XwalkNodeRendererController*>(arg);
 
   while (!self->uv_polling_stopped_) {
-#if defined(OS_LINUX)
+#if defined(OS_ANDROID) || defined(OS_LINUX)
     int r, timeout, fd;
     do {
       struct epoll_event ev;
