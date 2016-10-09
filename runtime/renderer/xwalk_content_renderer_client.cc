@@ -147,7 +147,7 @@ void XWalkContentRendererClient::RenderThreadStarted() {
 #if defined(ENABLE_NODE)
   if (cmd_line->HasSwitch(switches::kXWalkEnableNode)) {
     base::FilePath path;
-    GURL::GURL url(base::CommandLine::ForCurrentProcess()->GetSwitchValueNative(
+    GURL url(base::CommandLine::ForCurrentProcess()->GetSwitchValueNative(
         switches::kStartupUrl));
     bool is_local = url.SchemeIsFile() && net::FileURLToFilePath(url, &path);
     if (is_local) {
